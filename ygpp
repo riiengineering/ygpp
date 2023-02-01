@@ -1,0 +1,184 @@
+#!/usr/bin/awk -f
+#
+# This is Yoshi's Generic Preprocessor, a line-based generic file preprocessor.
+#
+# Copyright 2022, 2023 Dennis Camera (dennis.camera at riiengineering.ch)
+#
+# This file is part of ygpp.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# Usage: ygpp somefile...
+
+function fatal(errmsg) {
+	printf "%s:%u: %s\n", ("-" != FILENAME ? FILENAME : "stdin"), FNR, errmsg | "cat >&2"
+	close("cat >&2")
+	exit (e=1)
+}
+
+function bool(v) {
+	if (v ~ /^(TRUE|[Tt]rue)$/)
+		return 1
+	else if (v ~ /^(FALSE|[Ff]alse)$/)
+		return 0
+	else if (v ~ /^[0-9]+$/)
+		return !!int(v)
+	else
+		return 0
+}
+
+function isdef(var) {
+	return (var in ENVIRON)
+}
+
+function _p_update(p_name,    _i, _s) {
+	_s = 1
+	for (_i = 1; _i <= p_stacks[p_name, "p_last"]; ++_i)
+		_s = _s && p_stacks[p_name, _i]
+	p_stacks[p_name, "p_state"] = _s
+}
+
+function p_push(p_name, v) {
+	p_stacks[p_name, ++p_stacks[p_name, "p_last"]] = v
+	_p_update(p_name)
+}
+
+function p_pop(p_name,    _ov) {
+	if (p_stacks[p_name, "p_last"] < 1)
+		fatal("no matching #if* for #endif")
+	_ov = p_stacks[p_name, p_stacks[p_name, "p_last"]]
+	delete p_stacks[p_name, p_stacks[p_name, "p_last"]--]
+	_p_update(p_name)
+	return _ov
+}
+
+function p_state(p_name) {
+	# p_last implies p_state
+	return !p_stacks[p_name, "p_last"] || p_stacks[p_name, "p_state"]
+}
+
+function p_delete(p_name,    _k) {
+	for (_k in p_stacks)
+		if (index(_k, p_name SUBSEP) == 1)
+			delete p_stacks[_k]
+}
+
+function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
+	if (/^#[a-z]/) {
+		# potential processor instruction
+		_iname = substr($1, 2)
+	}
+
+	if (_iname == "dnl") {
+		# comment, ignore
+	} else if (_iname == "if") {
+		# evaluate argument as shell command
+		# short-circuit if already in a falsey block
+		_tmp1 = p_state(p_name) && system(substr($0, index($0, $2)))
+		p_push(p_name, !_tmp1)
+	} else if (_iname == "ifbool") {
+		if (p_state(p_name)) {
+			while ($2 ~ /^!/) { _tmp1++; $2 = substr($2, 2) }
+			_tmp2 = bool(ENVIRON[$2])
+			if (_tmp1 % 2)
+				_tmp2 = !_tmp2
+		} else {
+			_tmp2 = 0
+		}
+		p_push(p_name, _tmp2)
+	} else if (_iname == "ifdef") {
+		p_push(p_name, !!isdef($2))
+	} else if (_iname == "ifndef") {
+		p_push(p_name, !isdef($2))
+	} else if (_iname == "else") {
+		p_push(p_name, !p_pop(p_name))
+	} else if (_iname == "endif") {
+		p_pop(p_name)
+	} else if (_iname == "define") {
+		if (p_state(p_name))
+			ENVIRON[$2] = substr($0, index($0, $3))
+	} else if (_iname == "undef") {
+		if (p_state(p_name))
+			delete ENVIRON[$2]
+	} else if (_iname == "defblock") {
+		_tmp1 = $2  # block name
+		if ("defblock" == p_name)
+			fatal("#defblocks cannot be nested")
+		if (p_state(p_name)) {
+			if (_tmp1 in s_blocks)
+				fatal("block `" _tmp1 "' is already defined")
+			# register block even if it's empty
+			s_blocks[_tmp1] = ""
+		}
+		while ((getline) && !/^#endblock/) {
+			if (p_state(p_name)) {
+				s_blocks[_tmp1] = s_blocks[_tmp1] eval_input("defblock")
+			}
+		}
+		p_delete("defblock")
+	} else {
+		# commands that produce output
+		if (!p_state(p_name))
+			return
+
+		if (_iname == "useblock") {
+			if (!($2 in s_blocks))
+				fatal("no block named " $2)
+			_res = s_blocks[$2]
+		} else if (_iname == "include") {
+			while ((getline _tmp1 < $2))
+				_res = _res _tmp1 ORS
+			close($2)
+		} else {
+			_tmp3 = $0
+			do {
+				# allow escaping of characters
+				if (match(_tmp3, /[\\]./)) {
+					# consume part up to and including escaped character
+					_tmp1 = substr(_tmp3, 1, RSTART-1)  # prefix
+					_tmp2 = substr(_tmp3, RSTART+1, 1)  # character
+					_tmp3 = substr(_tmp3, RSTART + RLENGTH)  # rest
+				} else {
+					# consume all
+					_tmp1 = _tmp3
+					_tmp2 = ""
+					_tmp3 = ""
+				}
+
+				# variable expansion (on "prefix")
+				# NOTE: ensure that the } is not the last character (%{foo\})
+				while (match(_tmp1, /%\{[A-Za-z0-9_]+\}/)) {
+					envvar = substr(_tmp1, RSTART + 2, RLENGTH - 3)
+					if (!(envvar in ENVIRON))
+						fatal(envvar " is not set")
+					_tmp1 = substr(_tmp1, 1, RSTART-1) ENVIRON[envvar] substr(_tmp1, RSTART + RLENGTH)
+				}
+
+				# append "prefix" and escaped character to _res
+				_res = _res _tmp1 _tmp2
+			} while (_tmp3)
+			_res = _res ORS
+		}
+
+		return _res
+	}
+}
+
+BEGIN {
+	FS = " "  # defaults
+}
+
+{
+	printf "%s", eval_input("main")
+}
