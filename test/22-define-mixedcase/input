@@ -1,0 +1,7 @@
+#define a lorem
+#define b ipsum
+#define C dolor
+#define _d sit
+#define __e amet
+%{a} %{b} %{C} %{_d} %{__e}.
+%{A}%{B}.

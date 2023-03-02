@@ -1,0 +1,6 @@
+FOO=%{FOO}
+BAR=%{BAR}
+#undef FOO
+#ifdef FOO
+FOO=%{FOO}
+#endif

@@ -1,0 +1,15 @@
+#defblock lorem
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Diam sit amet nisl suscipit
+adipiscing bibendum est ultricies. Vitae ultricies leo integer malesuada nunc
+vel risus. Ornare massa eget egestas purus viverra accumsan in nisl
+nisi. Malesuada fames ac turpis egestas. Sit amet consectetur adipiscing
+elit. Elit ut aliquam purus sit amet luctus venenatis. Sed viverra tellus in hac
+habitasse. Sollicitudin aliquam ultrices sagittis orci a scelerisque
+purus. Cursus metus aliquam eleifend mi in nulla posuere sollicitudin. Vel risus
+commodo viverra maecenas accumsan. Posuere lorem ipsum dolor sit amet
+consectetur adipiscing. Malesuada fames ac turpis egestas integer eget aliquet
+nibh. Consectetur adipiscing elit ut aliquam purus. Nulla aliquet porttitor
+lacus luctus accumsan tortor posuere.
+#endblock
+#useblock lorem

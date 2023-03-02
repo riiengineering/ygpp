@@ -1,0 +1,5 @@
+This file contains environment variables to be expanded.
+
+FOO=%{FOO}
+BAR=%{BAR}
+TEXT=%{TEXT}

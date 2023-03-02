@@ -1,0 +1,4 @@
+FOO=1
+BAR=some text
+SHQUOTED='some shell-style quoted text'
+CQUOTED="some C-style quoted text"

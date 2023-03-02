@@ -1,0 +1,5 @@
+This file contains environment variables to be expanded.
+
+FOO=1
+BAR=2
+TEXT=this is a text
