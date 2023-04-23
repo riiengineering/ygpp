@@ -1,0 +1,93 @@
+---
+name: unit-tests
+on: [push, pull_request]
+jobs:
+  unit-tests:
+    defaults:
+      run:
+        shell: sh
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu
+        awk:
+          - busybox-awk  # BusyBox
+          - gawk
+          - mawk
+        include:
+          - { os: macos, awk: awk }  # "Apple" awk
+          - { os: macos, awk: nawk }
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Prepare system
+        id: prepare-system
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+          MATRIX_AWK: ${{ matrix.awk }}
+        run: |
+          echo '::group::Install dependencies'
+
+          set -x
+          case ${MATRIX_OS%%-*}-${MATRIX_AWK}
+          in
+            (macos-awk)
+              echo "AWK=$(command -v awk)" >>"${GITHUB_ENV:?}"
+              ;;
+            (macos-nawk)
+              brew install awk
+              echo "AWK=$(command -v awk)" >>"${GITHUB_ENV:?}"
+              ;;
+            (ubuntu-gawk|ubuntu-mawk)
+              sudo apt-get -y install "${MATRIX_AWK}"
+              echo "AWK=$(command -v "${MATRIX_AWK}")" >>"${GITHUB_ENV:?}"
+              ;;
+            (ubuntu-busybox-awk)
+              sudo apt-get -y install busybox
+
+              mkdir -p ~/.local/bin
+              printf >~/.local/bin/busybox-awk "#!/bin/sh\\nexec %s awk \"\$@\"\\n" "$(command -v busybox)"
+              chmod +x ~/.local/bin/busybox-awk
+
+              echo "AWK=$(cd ~ && pwd -P)/.local/bin/busybox-awk" >>"${GITHUB_ENV:?}"
+              ;;
+            (*)
+          esac
+
+          echo '::endgroup::'
+      - name: Information
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+          MATRIX_AWK: ${{ matrix.awk }}
+          AWK: ${{ env.AWK }}
+        run: |
+          echo '::group::Software versions'
+
+          printf 'Kernel:\n'
+          uname -a
+
+          printf '\nPATH:\n%s\n' "${PATH}"
+
+          printf '\nShell: %s\n' "${SHELL-?}"
+
+          printf '\nAWK (%s):\n' "${AWK:-?}"
+          case ${MATRIX_OS%%-*}-${MATRIX_AWK}
+          in
+            (macos-awk|macos-nawk|*-gawk)
+              "${AWK:?}" --version ;;
+            (*-mawk)
+              "${AWK:?}" -W version ;;
+            (*-busybox-awk)
+              busybox --version | sed -n -e '/^\$/q' -e 'p' ;;
+            (*)
+              printf '%s\n' ? ;;
+          esac
+
+          echo '::endgroup::'
+      - name: Run unit tests
+        run: |
+          make AWK='${{ env.AWK }}' test
