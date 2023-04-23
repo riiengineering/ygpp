@@ -1,0 +1,3 @@
+Some text before the error occurs.
+#error This is an error
+More text after the error has occurred (should never be printed.)

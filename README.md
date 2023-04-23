@@ -93,6 +93,10 @@ instead of the `#useblock` line.
 
 ### Other
 
+#### `#error [message]`
+
+print an error message to `stderr` and terminate ygpp with exit status 1.
+
 #### `#include [otherfile]`
 
 include the contents of `otherfile` as if its contents were included in the

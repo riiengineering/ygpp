@@ -1,0 +1,10 @@
+Some text before the first conditional error.
+#define FOO always defined
+#ifndef FOO
+#error FOO is not defined.
+#endif
+Some text after the first #if.
+#ifdef FOO
+#error Foo is defined.
+#endif
+More text after the error has occurred (should never be printed.)
