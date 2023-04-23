@@ -1,1 +1,1 @@
-test/71-include-nonexist/input:2: reading from file `/nonexist' failed.
+test/71-include-nonexist/input:2: error: reading from file `/nonexist' failed.

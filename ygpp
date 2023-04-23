@@ -21,13 +21,22 @@
 #
 # Usage: ygpp somefile...
 
-function error(errmsg) {
-	printf "%s:%u: %s\n", ("-" != FILENAME ? FILENAME : "stdin"), FNR, errmsg | "cat >&2"
+function input_error(lvl, msg,    prefix) {
+	if ("error" == lvl) {
+		prefix = (COLOURED_OUTPUT ? "\033[1;91merror:\033[0m " : "error: ")
+	} else if ("warning" == lvl) {
+		prefix = (COLOURED_OUTPUT ? "\033[33mwarning:\033[0m " : "warning: ")
+	}
+	printf "%s:%u: %s%s\n", ("-" != FILENAME ? FILENAME : "stdin"), FNR, prefix, msg | "cat >&2"
 	close("cat >&2")
 }
 
+function warn(errmsg) {
+	input_error("warning", errmsg)
+}
+
 function fatal(errmsg) {
-	error(errmsg)
+	input_error("error", errmsg)
 	exit (e=1)
 }
 
@@ -168,7 +177,7 @@ function eval_input(p_name,    _iname, _res, _x) {
 		if (p_state(p_name)) {
 			_x["msg"] = $0
 			sub(/^#error[ \t]+/, "", _x["msg"])
-			fatal("error: " _x["msg"])
+			fatal(_x["msg"])
 		}
 	} else if (_iname == "if") {
 		# evaluate argument as shell command
@@ -222,7 +231,7 @@ function eval_input(p_name,    _iname, _res, _x) {
 		if (p_state(p_name)) {
 			_x["msg"] = $0
 			sub(/^#warning[ \t]+/, "", _x["msg"])
-			error("warning: " _x["msg"])
+			warn(_x["msg"])
 		}
 	} else {
 		# commands that produce output
@@ -306,6 +315,13 @@ function eval_input(p_name,    _iname, _res, _x) {
 
 BEGIN {
 	FS = " "  # defaults
+
+	if ("NOCOLOR" in ENVIRON)
+		COLOURED_OUTPUT = 0
+	else if ("always" == ENVIRON["COLOR"])
+		COLOURED_OUTPUT = 1
+	else
+		COLOURED_OUTPUT = (0 == system("test -t 1"))
 }
 
 {

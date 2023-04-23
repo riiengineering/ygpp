@@ -50,7 +50,7 @@ do
 		set -a
 		#shellcheck source=/dev/null
 		test -e "${testdir:?}/env" && . "${testdir:?}/env"
-		${AWK} -f "${YGPP:?}" "${testdir:?}/input"
+		NOCOLOR=1 ${AWK} -f "${YGPP:?}" "${testdir:?}/input"
 	} >"${test_out:?}" 2>"${test_err:?}" || test_rc=$?
 
 
