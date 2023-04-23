@@ -1,11 +1,8 @@
-#define FOO foo
-#define BAR bar
 FOO=%{FOO}
 BAR=%{BAR}
 #undef FOO
 #ifdef FOO
 FOO=%{FOO}
-#endif
-#ifdef BAR
-BAR=%{BAR}
+#else
+FOO is not defined.
 #endif
