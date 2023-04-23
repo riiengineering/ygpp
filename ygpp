@@ -39,7 +39,33 @@ function bool(v) {
 }
 
 function isdef(var) {
-	return (var in ENVIRON)
+	return (var in DEFIN) || (var in ENVIRON)
+}
+
+function getdef(var) {
+	if (var in DEFIN)
+		return DEFIN[var]
+	else if (var in ENVIRON)
+		return ENVIRON[var]
+}
+
+function shquot(s) {
+	gsub(/'/, "'\\''", s)
+	return "'" s "'"
+}
+
+function eval_shell_cmd(cmd,    _k) {
+	# export #defines to executed sub command
+	# in POSIX awk it is implementation-defined whether modifications to ENVIRON
+	# are available to sub-processes.
+	# Thus, any #defines made need to be exported to sub-processes.
+	cmd = "; " cmd
+	for (_k in DEFIN) {
+		cmd = " " _k "=" shquot(DEFIN[_k]) cmd
+	}
+	cmd = ((cmd ~ /^;/) ? ":" : "export") cmd
+
+	return system(cmd)
 }
 
 function _p_update(p_name,    _i, _s) {
@@ -91,12 +117,12 @@ function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
 	} else if (_iname == "if") {
 		# evaluate argument as shell command
 		# short-circuit if already in a falsey block
-		_tmp1 = p_state(p_name) && system(substr($0, index($0, $2)))
+		_tmp1 = p_state(p_name) && eval_shell_cmd(substr($0, index($0, $2)))
 		p_push(p_name, !_tmp1)
 	} else if (_iname == "ifbool") {
 		if (p_state(p_name)) {
 			while ($2 ~ /^!/) { _tmp1++; $2 = substr($2, 2) }
-			_tmp2 = bool(ENVIRON[$2])
+			_tmp2 = bool(getdef($2))
 			if (_tmp1 % 2)
 				_tmp2 = !_tmp2
 		} else {
@@ -113,10 +139,12 @@ function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
 		p_pop(p_name)
 	} else if (_iname == "define") {
 		if (p_state(p_name))
-			ENVIRON[$2] = substr($0, index($0, $3))
+			DEFIN[$2] = substr($0, index($0, $3))
 	} else if (_iname == "undef") {
-		if (p_state(p_name))
+		if (p_state(p_name)) {
+			delete DEFIN[$2]
 			delete ENVIRON[$2]
+		}
 	} else if (_iname == "defblock") {
 		_tmp1 = $2  # block name
 		if ("defblock" == p_name)
@@ -166,9 +194,9 @@ function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
 				# NOTE: ensure that the } is not the last character (%{foo\})
 				while (match(_tmp1, /%\{[A-Za-z0-9_]+\}/)) {
 					envvar = substr(_tmp1, RSTART + 2, RLENGTH - 3)
-					if (!(envvar in ENVIRON))
+					if (!isdef(envvar))
 						fatal(envvar " is not set")
-					_tmp1 = substr(_tmp1, 1, RSTART-1) ENVIRON[envvar] substr(_tmp1, RSTART + RLENGTH)
+					_tmp1 = substr(_tmp1, 1, RSTART-1) getdef(envvar) substr(_tmp1, RSTART + RLENGTH)
 				}
 
 				# append "prefix" and escaped character to _res

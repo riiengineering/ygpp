@@ -1,0 +1,9 @@
+FOO has the value "%{FOO}".
+#if test "${FOO}" = foo
+(and can be used in an #if conditional)
+#endif
+#define BAR bar
+BAR has the value "%{BAR}".
+#if test "${BAR}" = bar
+(and can be used in an #if conditional)
+#endif

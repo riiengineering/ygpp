@@ -1,0 +1,4 @@
+FOO has the value "foo".
+(and can be used in an #if conditional)
+BAR has the value "bar".
+(and can be used in an #if conditional)
