@@ -42,6 +42,14 @@ function bool(v) {
 		return 0
 }
 
+function dirname(path) {
+	if (path ~ /\//)
+		sub(/\/[^\/]*$/, "", path)
+	else
+		path = "."
+	return path
+}
+
 function isdef(var) {
 	return (var in DEFIN) || (var in ENVIRON)
 }
@@ -104,7 +112,7 @@ function p_delete(p_name,    _k) {
 			delete p_stacks[_k]
 }
 
-function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
+function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3, _tmp4) {
 	if (/^#[a-z]/) {
 		# potential processor instruction
 		_iname = substr($1, 2)
@@ -181,13 +189,36 @@ function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
 				fatal("no block named " $2)
 			_res = s_blocks[$2]
 		} else if (_iname == "include") {
+			# store old values
+			_tmp1 = FILENAME
+			_tmp2 = FNR
+
+			# store filename to include in _tmp3
+			_tmp3 = $0
+			sub(/^#include[ \t]+/, "", _tmp3)
+
+			if (_tmp3 !~ /^\//) {
+				# convert relative path to absolute
+				_tmp3 = dirname(_tmp1) "/" _tmp3
+			}
+
+			# override FILENAME and FNR
+			FILENAME = _tmp3
+			FNR = 0
+
 			while (1) {
-				_tmp2 = (getline _tmp1 < $2)
-				if (0 < _tmp2) {
-					_res = _res _tmp1 ORS
+				_tmp4 = (getline < _tmp3)
+				if (0 < _tmp4) {
+					++NR; ++FNR
+					_res = _res eval_input(p_name)
 				} else {
-					close($2)
-					if (0 == _tmp2)
+					close(_tmp3)
+
+					# restore FILENAME and FNR
+					FILENAME = _tmp1
+					FNR = _tmp2
+
+					if (0 == _tmp4)
 						break
 					else
 						fatal("reading from file `" $2 "' failed.")
