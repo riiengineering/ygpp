@@ -10,6 +10,13 @@ in
 	(*) coloured_output=true ;;
 esac
 
+if test -t 1
+then
+	STDOUT_ISATTY=true
+else
+	STDOUT_ISATTY=false
+fi
+
 dodiff() {
 	diff -u "$1" "$2" | sed '1,2{/^[+-]\{3\} /d;}'
 }
@@ -33,7 +40,7 @@ for testdir in "${tests_dir}"/*
 do
 	test -d "${testdir}" || continue
 
-	printf '[....] %s' "${testdir##*/}"
+	${STDOUT_ISATTY?} && printf '[....] %s' "${testdir##*/}"
 
 	test_out="${tmpdir:?}/${testdir##*/}.stdout"
 	test_err="${tmpdir:?}/${testdir##*/}.stderr"
@@ -73,21 +80,25 @@ do
 		&& cmp -s "${expect_out}" "${test_out}" \
 		&& cmp -s "${expect_err}" "${test_err}"
 	then
+		${STDOUT_ISATTY?} && printf '\r'
 		if ${coloured_output?}
 		then
-			printf '\r[\033[32m OK \033[0m]\r\n'
+			printf '[\033[32m OK \033[0m]'
 		else
-			printf '\r[ OK ]\r\n'
+			printf '[ OK ]'
 		fi
+		printf ' %s\n' "${testdir##*/}"
 	else
 		: $((failed_tests+=1))
 
+		${STDOUT_ISATTY?} && printf '\r'
 		if ${coloured_output?}
 		then
-			printf '\r[\033[1;91mFAIL\033[0m]\r\n'
+			printf '[\033[1;91mFAIL\033[0m]'
 		else
-			printf '\r[FAIL]\r\n'
+			printf '[FAIL]'
 		fi
+		printf ' %s\n' "${testdir##*/}"
 
 		showdiff "${expect_out:?}" "${test_out:?}" \
 		| {
