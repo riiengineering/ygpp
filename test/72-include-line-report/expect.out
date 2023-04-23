@@ -1,0 +1,11 @@
+This test tests nested includes including line reporting for warnings/errors.
+
+This is included file 1.
+
+This is included file 2.
+This is included file 2.1.
+
+This is included file 3.
+This is included file 3.1.
+This is included file 3.1.1.
+This is included file 3.1.2.

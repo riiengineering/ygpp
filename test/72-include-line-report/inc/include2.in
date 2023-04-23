@@ -1,0 +1,3 @@
+#warning include 2
+This is included file 2.
+#include include2_1.in

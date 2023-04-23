@@ -1,0 +1,4 @@
+#warning include 3.1
+This is included file 3.1.
+#include include3_1_1.in
+#include include3_1_2.in

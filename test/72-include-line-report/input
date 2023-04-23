@@ -1,0 +1,9 @@
+This test tests nested includes including line reporting for warnings/errors.
+#warning root
+
+#include inc/include1.in
+
+#include inc/include2.in
+
+#include inc/include3.in
+#warning end

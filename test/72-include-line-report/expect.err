@@ -1,0 +1,9 @@
+test/72-include-line-report/input:2: warning: root
+test/72-include-line-report/inc/include1.in:1: warning: include 1
+test/72-include-line-report/inc/include2.in:1: warning: include 2
+test/72-include-line-report/inc/include2_1.in:1: warning: include 2.1
+test/72-include-line-report/inc/include3.in:1: warning: include 3
+test/72-include-line-report/inc/include3_1.in:1: warning: include 3.1
+test/72-include-line-report/inc/include3_1_1.in:1: warning: include 3.1.1
+test/72-include-line-report/inc/include3_1_2.in:1: warning: include 3.1.2
+test/72-include-line-report/input:9: warning: end
