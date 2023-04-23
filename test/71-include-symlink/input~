@@ -1,0 +1,3 @@
+This test tests nested includes with symbolic links.
+
+#include inc/include1.in

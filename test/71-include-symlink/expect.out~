@@ -1,0 +1,11 @@
+This test tests nested includes with symbolic links.
+
+This is included file 1.
+
+This is sub1/file1.in.
+This is sub1/file2.in.
+
+This is complex1/file1.in.
+This is complex1/file2.in.
+This is complex1/file3.in.
+This is complex1/file4.in.

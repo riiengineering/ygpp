@@ -50,6 +50,50 @@ function dirname(path) {
 	return path
 }
 
+function has_command(command) {
+	return 0 == system("command -v " shquot(command) " >/dev/null 2>&1")
+}
+
+function command_output(cmd,    _l, _res) {
+	while (0 < (cmd | getline _l)) {
+		_res = (_res ? _res ORS : "") _l
+	}
+	close(cmd)
+	return _res
+}
+
+function resolve_symlink(path,    _x) {
+	if (0 == system("test -h " shquot(path))) {
+		if (!__resolve_symlink_cmd) {
+			if (has_command("readlink")) {
+				__resolve_symlink_cmd = "readlink"
+			} else if (has_command("file")) {
+				__resolve_symlink_cmd = "file"
+			} else if (has_command("realpath")) {
+				__resolve_symlink_cmd = "realpath"
+			}
+		}
+
+		if ("readlink" == __resolve_symlink_cmd) {
+			_x = command_output("readlink " shquot(path))
+			_x = dirname(path) "/" _x
+			return _x
+		} else if ("file" == __resolve_symlink_cmd) {
+			# POSIX
+			_x = command_output("LC_ALL=C file -h " shquot(path))
+			sub("^" path ": symbolic link to ", "", _x)
+			_x = dirname(path) "/" _x
+			return _x
+		} else if ("realpath" == __resolve_symlink_cmd) {
+			return command_output("realpath " shquot(path))
+		} else {
+			fatal("the symbolic link `" path "' could not be resolved due to an operating system limitation")
+		}
+	} else {
+		return path
+	}
+}
+
 function isdef(var) {
 	return (var in DEFIN) || (var in ENVIRON)
 }
@@ -200,7 +244,7 @@ function eval_input(p_name,    _iname, _res, _x) {
 
 			if (_x["incfile"] !~ /^\//) {
 				# convert relative path to absolute
-				_x["incfile"] = dirname(_x["old_FILENAME"]) "/" _x["incfile"]
+				_x["incfile"] = dirname(resolve_symlink(_x["old_FILENAME"])) "/" _x["incfile"]
 			}
 
 			# override FILENAME and FNR

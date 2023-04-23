@@ -1,0 +1,6 @@
+This is complex1/file1.in.
+#include file: symbolic link to: file2.in
+#include link -> file3.in
+#include file with line break.in
+#include file5.in
+#include ./../complex1/file6.in
