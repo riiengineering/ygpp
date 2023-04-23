@@ -97,6 +97,10 @@ instead of the `#useblock` line.
 
 print an error message to `stderr` and terminate ygpp with exit status 1.
 
+#### `#warning [message]`
+
+print a warning message to `stderr`, but continue processing the input file.
+
 #### `#include [otherfile]`
 
 include the contents of `otherfile` as if its contents were included in the

@@ -1,0 +1,3 @@
+Some text before the error occurs.
+#warning This is a warning
+More text after the warning.

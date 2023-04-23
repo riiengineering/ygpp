@@ -21,9 +21,13 @@
 #
 # Usage: ygpp somefile...
 
-function fatal(errmsg) {
+function error(errmsg) {
 	printf "%s:%u: %s\n", ("-" != FILENAME ? FILENAME : "stdin"), FNR, errmsg | "cat >&2"
 	close("cat >&2")
+}
+
+function fatal(errmsg) {
+	error(errmsg)
 	exit (e=1)
 }
 
@@ -161,6 +165,12 @@ function eval_input(p_name,    _iname, _res, _tmp1, _tmp2, _tmp3) {
 			}
 		}
 		p_delete("defblock")
+	} else if (_iname == "warning") {
+		if (p_state(p_name)) {
+			_tmp1 = $0
+			sub(/^#warning[ \t]+/, "", _tmp1)
+			error("warning: " _tmp1)
+		}
 	} else {
 		# commands that produce output
 		if (!p_state(p_name))
