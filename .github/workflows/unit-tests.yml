@@ -33,6 +33,14 @@ jobs:
           echo '::group::Install dependencies'
 
           set -x
+          case ${MATRIX_OS%%-*}
+          in
+            (macos)
+              brew install colordiff ;;
+            (ubuntu)
+              sudo apt-get install colordiff ;;
+          esac
+
           case ${MATRIX_OS%%-*}-${MATRIX_AWK}
           in
             (macos-awk)
