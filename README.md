@@ -1,10 +1,28 @@
 # ygpp
-Yoshi's Generic Preprocessor
+
+Yoshi's Generic Preprocessor (ygpp) is an easy to use generic file preprocessor
+which is inspired by the well-known C preprocessor (`cpp(1)`).
+
+ygpp is implemented in pure POSIX [`awk(1)`](http://www.opengroup.org/onlinepubs/9699919799/utilities/awk.html).
 
 ## Installation
 
-To install ygpp(1) the only requirement is a POSIX compatible sh(1) and awk(1)
-implementation.
+**Requirements:**  
+To install ygpp the only requirement is a POSIX compatible `awk(1)` and
+`sh(1)` implementation to be available.  
+
+To install ygpp from source:
+```sh
+make AWK=awk prefix=/usr/local install
+````
+
+If you really want to, you can also install the latest version directly from the
+web:
+```sh
+curl -L -o ~/.local/bin/ygpp https://github.com/riiengineering/ygpp/raw/main/ygpp
+```
+You need to adjust the shebang line manually if you don't want to use
+`/usr/bin/awk`.
 
 ## Usage
 
@@ -105,3 +123,6 @@ print a warning message to `stderr`, but continue processing the input file.
 
 include the contents of `otherfile` as if its contents were included in the
 input file in place of the `#include` line.
+
+-----
+[![riiengineered.](https://www.riiengineering.ch/riiengineered-400.png)](//www.riiengineering.ch)
