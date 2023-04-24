@@ -21,6 +21,15 @@ dodiff() {
 	diff -u "$1" "$2" | sed '1,2{/^[+-]\{3\} /d;}'
 }
 
+prefix_ifoutput() {
+	if read -r __first_line
+	then
+		printf '%s\n%s\n' "${1-}" "${__first_line}"
+		unset __first_line
+		cat
+	fi
+}
+
 if ${coloured_output?} && command -v colordiff >/dev/null 2>&1
 then
 	showdiff() { dodiff "$@" | colordiff; }
@@ -101,24 +110,9 @@ do
 		printf ' %s\n' "${testdir##*/}"
 
 		showdiff "${expect_out:?}" "${test_out:?}" \
-		| {
-			if read -r _first_line
-			then
-				printf 'stdout:\n%s\n' "${_first_line}"
-				unset _first_line
-				cat
-			fi
-		}
-
+		| prefix_ifoutput 'stdout:'
 		showdiff "${expect_err:?}" "${test_err:?}" \
-		| {
-			if read -r _first_line
-			then
-				printf 'stderr:\n%s\n' "${_first_line}"
-				unset _first_line
-				cat
-			fi
-		}
+		| prefix_ifoutput 'stderr:'
 	fi
 done
 
