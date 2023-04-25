@@ -1,0 +1,28 @@
+this is some text containing a backslash (\) for testing.
+this is some text containing two backslashes (\\) for testing.
+this is some text containing three backslashes (\\\) for testing.
+this is some text containing four backslashes (\\\\) for testing.
+this is some text containing five backslashes (\\\\\) for testing.
+this is some text containing six backslashes (\\\\\\) for testing.
+
+#define x this is x
+%{x}
+\%{x}
+%\{x}
+%{\x}
+%{x\}
+\%\{\x\}
+#define foo this is foo
+%{foo}
+\%{foo}
+%\{foo}
+%{\foo}
+%{f\oo}
+%{fo\o}
+%{\f\o\o}
+%{foo\}
+\%\{\f\o\o\}
+
+\\%{x}
+\\\%{x}
+\\\\%{x}
