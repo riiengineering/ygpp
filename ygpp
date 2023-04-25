@@ -119,6 +119,41 @@ function shquot(s) {
 	return "'" s "'"
 }
 
+function expand_definitions(src,    _stack, _res, _var, _t, _old_RSTART, _old_RLENGTH) {
+	# NOTE: This function ignores escaped characters!
+
+	# save RSTART, RLENGTH
+	_old_RSTART = RSTART
+	_old_RLENGTH = RLENGTH
+
+	while (match(src, /%\{[A-Za-z0-9_]+\}/)) {
+		_res = _res substr(src, 1, RSTART - 1)
+
+		_var = substr(src, RSTART + 2, RLENGTH - 3)
+		if (!isdef(_var)) {
+			fatal(_var " is not defined")
+		}
+
+		if (_var in _stack) {
+			# self-referencing expansion, treat as literal like cpp(1)
+			_res = _res substr(src, RSTART, RLENGTH)
+		} else {
+			# expand
+			_t = getdef(_var)
+			++_stack[_var]
+			_res = _res expand_definitions(_t, _stack)
+		}
+
+		src = substr(src, RSTART + RLENGTH)
+	}
+
+	# restore RSTART, RLENGTH
+	RSTART = _old_RSTART
+	RLENGTH = _old_RLENGTH
+
+	return _res src
+}
+
 function eval_shell_cmd(cmd,    _k) {
 	# export #defines to executed sub command
 	# in POSIX awk it is implementation-defined whether modifications to ENVIRON
@@ -297,13 +332,14 @@ function eval_input(p_name,    _iname, _res, _x) {
 				# variable expansion (on "prefix")
 				# NOTE: ensure that the } is not the last character (%{foo\})
 				while (match(_x["prefix"], /%\{[A-Za-z0-9_]+\}/)) {
-					envvar = substr(_x["prefix"], RSTART + 2, RLENGTH - 3)
-					if (!isdef(envvar))
-						fatal(envvar " is not set")
-					_x["prefix"] = substr(_x["prefix"], 1, RSTART-1) getdef(envvar) substr(_x["prefix"], RSTART + RLENGTH)
+					# expand and add to _res, then process the rest
+					_res = _res substr(_x["prefix"], 1, RSTART - 1)
+					_res = _res expand_definitions(substr(_x["prefix"], RSTART, RLENGTH))
+					_x["prefix"] = substr(_x["prefix"], RSTART + RLENGTH)
 				}
 
-				# append "prefix" and escaped character to _res
+				# append the rest of "prefix" and the escaped character (if any)
+				# to _res
 				_res = _res _x["prefix"] _x["eschar"]
 			} while (_x["rest"])
 			_res = _res ORS
