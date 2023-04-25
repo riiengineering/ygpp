@@ -1,0 +1,4 @@
+#dnl source: https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html
+#define TABLESIZE %{BUFSIZE}
+#define BUFSIZE 1024
+%{TABLESIZE}

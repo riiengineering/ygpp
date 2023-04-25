@@ -1,0 +1,5 @@
+#dnl source: https://gcc.gnu.org/onlinedocs/cpp/Self-Referential-Macros.html
+#define x (4 + %{y})
+#define y (2 * %{x})
+%{x}
+%{y}

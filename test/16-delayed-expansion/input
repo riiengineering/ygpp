@@ -1,0 +1,6 @@
+#dnl source: https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html
+#define BUFSIZE 1020
+#define TABLESIZE %{BUFSIZE}
+#undef BUFSIZE
+#define BUFSIZE 37
+%{TABLESIZE}
