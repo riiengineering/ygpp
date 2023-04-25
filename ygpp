@@ -238,8 +238,11 @@ function eval_input(p_name,    _iname, _res, _x) {
 	} else if (_iname == "endif") {
 		p_pop(p_name)
 	} else if (_iname == "define") {
-		if (p_state(p_name))
-			DEFIN[$2] = substr($0, index($0, $3))
+		if (p_state(p_name)) {
+			_x["value"] = substr($0, index($0, $2) + length($2))
+			sub(/^[ \t]+/, "", _x["value"])
+			DEFIN[$2] = _x["value"]
+		}
 	} else if (_iname == "undef") {
 		if (p_state(p_name)) {
 			delete DEFIN[$2]

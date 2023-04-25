@@ -1,0 +1,9 @@
+This file contains definitions to be expanded.
+
+#dnl test basic expansion of a #define
+#define FOO foo
+%{FOO}
+#dnl test expansion of a #define whose value is equal to its name
+#dnl i.e. test if the start of the value is detected correctly
+#define EPERM EPERM
+%{EPERM}
