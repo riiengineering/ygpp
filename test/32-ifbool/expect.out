@@ -1,0 +1,12 @@
+!UNDEF
+ENV_TRUE
+!!ENV_TRUE
+!!!!ENV_TRUE
+!ENV_FALSE
+!ENV_EMPTY
+
+D_TRUE
+D_true
+D_True
+D_1
+D_42

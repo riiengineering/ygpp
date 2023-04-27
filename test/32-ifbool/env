@@ -1,0 +1,3 @@
+ENV_TRUE=true
+ENV_FALSE=false
+ENV_EMPTY=

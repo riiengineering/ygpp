@@ -1,3 +1,2 @@
-UNDEFINED is not defined.
-UNDEFINED isndef.
-FOO is defined as: 
+ENV_VAR is defined as some value.
+MYDEF is defined as 42.

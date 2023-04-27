@@ -1,13 +1,13 @@
-#ifdef UNDEFINED
-what??
-#else
-UNDEFINED is not defined.
+#dnl test if environment variable is defined
+#ifdef ENV_VAR
+ENV_VAR is defined as %{ENV_VAR}.
 #endif
-#ifndef UNDEFINED
-UNDEFINED isndef.
+#dnl test if #define is defined
+#define MYDEF 42
+#ifdef MYDEF
+MYDEF is defined as %{MYDEF}.
 #endif
-#ifdef FOO
-FOO is defined as: %{FOO}
-#else
-FOO is not defined.
+#dnl test if an undefined value is defined
+#ifdef NOT_DEFINED
+NOT_DEFINED is defined as %{NOT_DEFINED}.
 #endif

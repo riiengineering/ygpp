@@ -1,0 +1,21 @@
+#dnl test if shell commands in #if are properly executed
+#if true
+true
+#endif
+#if false
+false
+#endif
+#if test 42 -gt 10
+42 -gt 10
+#endif
+#if test foo = foo
+foo = foo
+#endif
+#if test foo = bar
+foo = bar
+#else
+foo <> bar
+#endif
+#if [ 'lorem ipsum' = 'lorem ipsum' ]
+'lorem ipsum' = 'lorem ipsum'
+#endif

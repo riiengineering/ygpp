@@ -1,0 +1,10 @@
+#ifndef ABC
+ABC is not defined.
+#endif
+#ifndef DEF
+DEF is not defined. Setting a default value.
+#define DEF 1337
+#endif
+#ifdef DEF
+DEF is now defined as %{DEF}.
+#endif

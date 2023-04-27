@@ -1,0 +1,13 @@
+#ifdef UNDEFINED
+what??
+#else
+UNDEFINED is not defined.
+#endif
+#ifndef UNDEFINED
+UNDEFINED isndef.
+#endif
+#ifdef FOO
+FOO is defined as: %{FOO}
+#else
+FOO is not defined.
+#endif

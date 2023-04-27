@@ -1,1 +1,1 @@
-FOO=
+ENV_VAR='some value'

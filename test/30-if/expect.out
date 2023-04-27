@@ -1,0 +1,5 @@
+true
+42 -gt 10
+foo = foo
+foo <> bar
+'lorem ipsum' = 'lorem ipsum'

@@ -1,0 +1,3 @@
+#define XYZ 42
+#ifdef XYZ
+XYZ is defined as %{XYZ}.

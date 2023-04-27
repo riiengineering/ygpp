@@ -1,0 +1,90 @@
+#dnl undefined value is false
+#ifbool UNDEF
+UNDEF
+#else
+!UNDEF
+#endif
+#ifbool ENV_TRUE
+ENV_TRUE
+#endif
+#ifbool !ENV_TRUE
+!ENV_TRUE
+#endif
+#ifbool !!ENV_TRUE
+!!ENV_TRUE
+#endif
+#ifbool !!!ENV_TRUE
+!!!ENV_TRUE
+#endif
+#ifbool !!!!ENV_TRUE
+!!!!ENV_TRUE
+#endif
+#ifbool !!!!!ENV_TRUE
+!!!!!ENV_TRUE
+#endif
+#ifbool ENV_FALSE
+ENV_FALSE
+#endif
+#ifbool !ENV_FALSE
+!ENV_FALSE
+#endif
+#ifbool ENV_1
+ENV_1
+#endif
+#ifbool ENV_0
+ENV_0
+#endif
+#ifbool ENV_EMPTY
+ENV_EMPTY
+#else
+!ENV_EMPTY
+#endif
+
+#define D_TRUE TRUE
+#define D_true true
+#define D_True True
+#define D_TrUe TrUe
+#define D_FALSE FALSE
+#define D_false false
+#define D_False False
+#define D_FaLSe FaLSe
+#define D_1 1
+#define D_42 42
+#define D_0 0
+#define D_N1 -1
+#ifbool D_TRUE
+D_TRUE
+#endif
+#ifbool D_true
+D_true
+#endif
+#ifbool D_True
+D_True
+#endif
+#ifbool D_TrUe
+D_TrUe
+#endif
+#ifbool D_FALSE
+D_FALSE
+#endif
+#ifbool D_false
+D_false
+#endif
+#ifbool D_False
+D_False
+#endif
+#ifbool D_FaLSe
+D_FaLSe
+#endif
+#ifbool D_1
+D_1
+#endif
+#ifbool D_42
+D_42
+#endif
+#ifbool D_0
+D_0
+#endif
+#ifbool D_N1
+D_N1
+#endif
