@@ -176,7 +176,8 @@ function _p_update(p_name,    _i, _s) {
 }
 
 function p_push(p_name, v) {
-	p_stacks[p_name, ++p_stacks[p_name, "p_last"]] = v
+	++p_stacks[p_name, "p_last"]
+	p_stacks[p_name, p_stacks[p_name, "p_last"]] = v
 	_p_update(p_name)
 }
 
@@ -184,7 +185,8 @@ function p_pop(p_name,    _ov) {
 	if (p_stacks[p_name, "p_last"] < 1)
 		fatal("no matching #if* for #endif")
 	_ov = p_stacks[p_name, p_stacks[p_name, "p_last"]]
-	delete p_stacks[p_name, p_stacks[p_name, "p_last"]--]
+	--p_stacks[p_name, "p_last"]
+	delete p_stacks[p_name, p_stacks[p_name, "p_last"]]
 	_p_update(p_name)
 	return _ov
 }
@@ -317,10 +319,11 @@ function eval_input(p_name,    _iname, _res, _x) {
 					FILENAME = _x["old_FILENAME"]
 					FNR = _x["old_FNR"]
 
-					if (0 == _x["getline_status"])
+					if (0 == _x["getline_status"]) {
 						break
-					else
+					} else {
 						fatal("reading from file `" _x["incfile"] "' failed.")
+					}
 				}
 			}
 		} else {
