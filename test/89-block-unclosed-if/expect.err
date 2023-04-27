@@ -1,0 +1,1 @@
+test/89-block-unclosed-if/input:4: error: unclosed #if* in #defblock

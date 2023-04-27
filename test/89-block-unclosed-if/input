@@ -1,0 +1,4 @@
+#defblock my_block
+#ifdef FOO
+FOO is defined.
+#endblock
