@@ -15,7 +15,7 @@ all: $(BUILD_DIR)/ygpp
 $(BUILD_DIR)/:
 	mkdir $@
 
-$(BUILD_DIR)/ygpp: $(BUILD_DIR)/
+$(BUILD_DIR)/ygpp: $(BUILD_DIR)/ ygpp
 	sed -e "1s|^#!.*|#!$$(test -x '$(AWK)' && echo '$(AWK)' || command -v '$(AWK)') -f|" ./ygpp >$@
 	@head -n 1 $@ | grep -q '^#!/'
 
