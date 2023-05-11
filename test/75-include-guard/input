@@ -1,0 +1,3 @@
+This test tests the evaluation of include guards.
+
+#include inc/module2.in

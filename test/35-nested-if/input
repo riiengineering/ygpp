@@ -1,0 +1,34 @@
+Test if nested #ifs are evaluated correctly
+
+#define foo 42
+#ifdef foo
+true,
+#if true
+true,true
+#if false
+true,true,false
+#if true
+true,true,false,true
+#endif
+#if false
+true,true,false,false
+#endif
+#endif
+#endif
+#endif
+
+#ifndef Y
+#define Y
+Y
+#ifndef X
+#define X
+YX
+#endif
+#ifndef Z
+#define Z
+YZ
+#ifndef X
+YX
+#endif
+#endif
+#endif

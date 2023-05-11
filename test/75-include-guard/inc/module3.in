@@ -1,0 +1,7 @@
+#dnl this is module3
+#ifndef _HAVE_MODULE3
+#define _HAVE_MODULE3
+module3 requires module1
+#include module1.in
+module3
+#endif

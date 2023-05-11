@@ -1,0 +1,5 @@
+#dnl this is module1
+#ifndef _HAVE_MODULE1
+#define _HAVE_MODULE1
+module1
+#endif

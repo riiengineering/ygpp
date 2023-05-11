@@ -1,0 +1,8 @@
+Test if nested #ifs are evaluated correctly
+
+true,
+true,true
+
+Y
+YX
+YZ
