@@ -185,8 +185,8 @@ function p_pop(p_name,    _ov) {
 	if (p_stacks[p_name, "p_last"] < 1)
 		fatal("no matching #if* for #endif")
 	_ov = p_stacks[p_name, p_stacks[p_name, "p_last"]]
-	--p_stacks[p_name, "p_last"]
 	delete p_stacks[p_name, p_stacks[p_name, "p_last"]]
+	--p_stacks[p_name, "p_last"]
 	_p_update(p_name)
 	return _ov
 }
