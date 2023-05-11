@@ -294,7 +294,6 @@ function eval_input(p_name,    _iname, _res, _x) {
 			_x["old_FILENAME"] = FILENAME
 			_x["old_FNR"] = FNR
 
-			# store filename to include in _tmp3
 			_x["incfile"] = $0
 			sub(/^#include[ \t]+/, "", _x["incfile"])
 
