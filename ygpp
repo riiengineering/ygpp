@@ -223,8 +223,8 @@ function eval_input(p_name,    _iname, _res, _x) {
 	} else if (_iname == "if") {
 		# evaluate argument as shell command
 		# short-circuit if already in a falsey block
-		_x["cond"] = p_state(p_name) && eval_shell_cmd(substr($0, index($0, $2)))
-		p_push(p_name, !_x["cond"])
+		_x["cond"] = p_state(p_name) && !eval_shell_cmd(substr($0, index($0, $2)))
+		p_push(p_name, _x["cond"])
 	} else if (_iname == "ifbool") {
 		if (p_state(p_name)) {
 			while ($2 ~ /^!/) { _x["inv"]++; $2 = substr($2, 2) }
