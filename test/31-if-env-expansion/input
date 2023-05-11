@@ -7,3 +7,6 @@ BAR has the value "%{BAR}".
 #if test "${BAR}" = bar
 (and can be used in an #if conditional)
 #endif
+#if test -n "${UNDEF-}"
+UNDEF has the value '%{UNDEF}', WTF?!
+#endif

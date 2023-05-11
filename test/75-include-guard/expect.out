@@ -6,3 +6,4 @@ module2 requires module3
 module3 requires module1
 module3
 module2
+ABC is false.

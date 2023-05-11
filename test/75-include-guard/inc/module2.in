@@ -8,4 +8,9 @@ module2 requires module3
 #include module3.in
 #endif
 module2
+#ifbool ABC
+ABC is true.
+#else
+ABC is false.
+#endif
 #endif
