@@ -208,7 +208,7 @@ function p_delete(p_name,    _k) {
 
 function eval_input(p_name,    _iname, _res, _x) {
 	if (/^#[a-z]/) {
-		# potential processor instruction
+		# processor directive
 		_iname = substr($1, 2)
 	}
 
@@ -283,7 +283,7 @@ function eval_input(p_name,    _iname, _res, _x) {
 			warn(_x["msg"])
 		}
 	} else {
-		# commands that produce output
+		# directives which produce output
 		if (!p_state(p_name))
 			return
 
@@ -327,6 +327,8 @@ function eval_input(p_name,    _iname, _res, _x) {
 					}
 				}
 			}
+		} else if (_iname) {
+			fatal("invalid directive: #" _iname)
 		} else {
 			_x["rest"] = $0
 			do {
