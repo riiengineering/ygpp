@@ -31,6 +31,19 @@ function input_error(lvl, msg,    prefix) {
 	close("cat >&2")
 }
 
+function input_nextline(    _r) {
+	if (INCFILENAME) {
+		_r = getline < INCFILENAME
+	} else {
+		_r = getline
+	}
+
+	if (0 > _r) {
+		fatal("reading from file `" (INCFILENAME ? INCFILENAME : FILENAME) "' failed.")
+	}
+	return _r
+}
+
 function warn(errmsg) {
 	input_error("warning", errmsg)
 }
@@ -267,7 +280,7 @@ function eval_input(p_name,    _iname, _res, _x) {
 			# register block even if it's empty
 			s_blocks[_x["blockname"]] = ""
 		}
-		while ((getline) && !/^#endblock/) {
+		while (0 < input_nextline() && !/^#endblock( |$)/) {
 			if (p_state(p_name)) {
 				s_blocks[_x["blockname"]] = s_blocks[_x["blockname"]] eval_input("defblock")
 			}
@@ -292,7 +305,8 @@ function eval_input(p_name,    _iname, _res, _x) {
 				fatal("no block named " $2)
 			_res = s_blocks[$2]
 		} else if (_iname == "include") {
-			# store old values
+			# store old file variables
+			_x["old_INCFILENAME"] = INCFILENAME
 			_x["old_FILENAME"] = FILENAME
 			_x["old_FNR"] = FNR
 
@@ -304,8 +318,9 @@ function eval_input(p_name,    _iname, _res, _x) {
 				_x["incfile"] = dirname(resolve_symlink(_x["old_FILENAME"])) "/" _x["incfile"]
 			}
 
-			# override FILENAME and FNR
-			FILENAME = _x["incfile"]
+			# override file variables
+			INCFILENAME = _x["incfile"]
+			FILENAME = INCFILENAME
 			FNR = 0
 
 			while (1) {
@@ -316,15 +331,15 @@ function eval_input(p_name,    _iname, _res, _x) {
 				} else {
 					close(_x["incfile"])
 
-					# restore FILENAME and FNR
+					# restore file variables
+					INCFILENAME = _x["old_INCFILENAME"]
 					FILENAME = _x["old_FILENAME"]
 					FNR = _x["old_FNR"]
 
-					if (0 == _x["getline_status"]) {
-						break
-					} else {
+					if (0 > _x["getline_status"]) {
 						fatal("reading from file `" _x["incfile"] "' failed.")
 					}
+					break
 				}
 			}
 		} else if (_iname) {
