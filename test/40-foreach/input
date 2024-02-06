@@ -1,0 +1,3 @@
+#foreach x foo bar baz
+%{x}
+#endforeach

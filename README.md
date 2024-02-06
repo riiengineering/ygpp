@@ -96,6 +96,17 @@ like `#ifdef` but negated, i.e. the lines inside this block are printed if
 `VARIABLE` is *not* defined in the process' environment.
 
 
+### Loops
+
+#### `#foreach VARIABLE ITEMS...` ... `#endforeach`
+
+re-evaluate the lines between `#foreach` and `#endforeach` once for every `ITEM`
+(a space-separated list of items, including `%`-expansions) with the `VARIABLE`
+being set to each of the `ITEMS` once.
+
+`#foreach` cannot be nested.
+
+
 ### Blocks
 
 #### `#defblock [BLOCK NAME]` ... `#endblock`

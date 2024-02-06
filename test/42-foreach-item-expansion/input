@@ -1,0 +1,8 @@
+#define items1 foo bar baz
+#foreach x %{items1}
+%{x}
+#endforeach
+
+#foreach y %{ENV_ITEMS}
+%{y}
+#endforeach

@@ -219,6 +219,14 @@ function p_delete(p_name,    _k) {
 			delete p_stacks[_k]
 }
 
+function splitinto(s, a, k, fs,    _c, _i, _t) {
+	_c = split(s, _t, fs)
+	for (_i = 1; _i <= _c; ++_i) {
+		a[k, _i] = _t[_i]
+	}
+	return _c
+}
+
 function eval_input(p_name,    _iname, _res, _x) {
 	if (/^#[a-z]/) {
 		# processor directive
@@ -304,6 +312,44 @@ function eval_input(p_name,    _iname, _res, _x) {
 			if (!($2 in s_blocks))
 				fatal("no block named " $2)
 			_res = s_blocks[$2]
+		} else if (_iname == "foreach") {
+			# process #foreach line
+			_x["loopvar"] = $2
+			$1 = $2 = ""
+			_x["numforitems"] = splitinto(expand_definitions($0), _x, "foritems", " ")
+
+			# read and store loop body
+			_x["loopbody_lines"] = 0
+			while (0 < input_nextline() && !/^#endforeach( |$)/) {
+				++_x["loopbody_lines"]
+				_x["loopbody", _x["loopbody_lines"]] = $0
+			}
+			if (!/^#endforeach( |$)/) {
+				# unclosed foreach
+				fatal("unclosed #foreach")
+			}
+
+			if (p_state(p_name) && 0 < _x["loopbody_lines"]) {
+				if (_x["loopvar"] in DEFIN) {
+					_x["olddef"] = DEFIN[_x["loopvar"]]
+				}
+
+				# iterate loop
+				for (_x["i"] = 1; _x["i"] <= _x["numforitems"]; ++_x["i"]) {
+					DEFIN[_x["loopvar"]] = _x["foritems", _x["i"]]
+					for (_x["l"] = 1; _x["l"] <= _x["loopbody_lines"]; ++_x["l"]) {
+						# XXX: separate p_name for loop iterations
+						$0 = _x["loopbody", _x["l"]]
+						_res = _res eval_input(p_name)
+					}
+				}
+
+				if ("olddef" in _x) {
+					DEFIN[_x["loopvar"]] = _x["olddef"]
+				} else {
+					delete DEFIN[_x["loopvar"]]
+				}
+			}
 		} else if (_iname == "include") {
 			# store old file variables
 			_x["old_INCFILENAME"] = INCFILENAME
