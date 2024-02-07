@@ -1,0 +1,1 @@
+test/39-close-if-endblock/input:3: error: cannot close #if with #endblock (opened at test/39-close-if-endblock/input:1)
