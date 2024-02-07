@@ -49,6 +49,19 @@ for testdir in "${tests_dir}"/*
 do
 	test -d "${testdir}" || continue
 
+	if test -e "${testdir}/skip"
+	then
+		if ${coloured_output?}
+		then
+			printf '[\033[1;37mSKIP\033[0m]'
+		else
+			printf '[SKIP]'
+		fi
+		printf ' %s\n' "${testdir##*/}"
+
+		continue
+	fi
+
 	${STDOUT_ISATTY?} && printf '[....] %s' "${testdir##*/}"
 
 	test_out="${tmpdir:?}/${testdir##*/}.stdout"
