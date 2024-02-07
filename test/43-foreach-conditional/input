@@ -1,0 +1,12 @@
+#define X 1
+#define Y NO
+#ifbool X
+#foreach x 1 2 3
+%{x}
+#endforeach
+#endif
+#ifbool Y
+#foreach y a b c
+%{y}
+#endforeach
+#endif
