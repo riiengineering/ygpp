@@ -1,0 +1,1 @@
+test/49-close-if-endforeach/input:4: error: cannot close #if with #endforeach (opened at test/49-close-if-endforeach/input:2)

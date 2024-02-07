@@ -1,0 +1,4 @@
+#define YES 1
+#ifbool YES
+foo
+#endforeach

@@ -1,1 +1,1 @@
-test/39-if-unclosed/input:3: error: unclosed #if*
+test/39-if-unclosed/input:3: error: unclosed #if (opened at test/39-if-unclosed/input:2)

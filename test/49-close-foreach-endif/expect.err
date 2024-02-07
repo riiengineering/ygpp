@@ -1,0 +1,1 @@
+test/49-close-foreach-endif/input:3: error: unclosed #foreach (opened at test/49-close-foreach-endif/input:1)

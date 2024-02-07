@@ -188,20 +188,35 @@ function _p_update(p_name,    _i, _s) {
 	p_stacks[p_name, "p_state"] = _s
 }
 
-function p_push(p_name, v) {
+function p_push(p_name, type, v) {
 	++p_stacks[p_name, "p_last"]
 	p_stacks[p_name, p_stacks[p_name, "p_last"]] = v
+	p_stacks[p_name, p_stacks[p_name, "p_last"] ".loc"] = FILENAME ":" FNR
+	p_stacks[p_name, p_stacks[p_name, "p_last"] ".type"] = type
 	_p_update(p_name)
 }
 
-function p_pop(p_name,    _ov) {
-	if (p_stacks[p_name, "p_last"] < 1)
-		fatal("no matching #if* for #endif")
+function p_pop(p_name, type,   _ov) {
+	if (p_stacks[p_name, "p_last"] < 1) {
+		fatal(sprintf("no matching #%s for #end%s", type, type))
+	}
+	if (type != p_stacks[p_name, p_stacks[p_name, "p_last"] ".type"]) {
+		fatal(sprintf("cannot close #%s with #end%s (opened at %s)",
+		              p_stacks[p_name, p_stacks[p_name, "p_last"] ".type"],
+		              type,
+		              p_stacks[p_name, p_stacks[p_name, "p_last"] ".loc"]))
+	}
 	_ov = p_stacks[p_name, p_stacks[p_name, "p_last"]]
 	delete p_stacks[p_name, p_stacks[p_name, "p_last"]]
+	delete p_stacks[p_name, p_stacks[p_name, "p_last"] ".loc"]
+	delete p_stacks[p_name, p_stacks[p_name, "p_last"] ".type"]
 	--p_stacks[p_name, "p_last"]
 	_p_update(p_name)
 	return _ov
+}
+
+function p_last(p_name, info) {
+	return p_stacks[p_name, p_stacks[p_name, "p_last"] (info ? "."info : "")]
 }
 
 function p_state(p_name) {
@@ -247,7 +262,7 @@ function eval_input(p_name,    _iname, _res, _x) {
 		sub(/^#if[ \t]+/, "", _x["cmd"])
 		# short-circuit if already in a falsey block
 		_x["cond"] = p_state(p_name) && !eval_shell_cmd(_x["cmd"])
-		p_push(p_name, _x["cond"])
+		p_push(p_name, "if", _x["cond"])
 	} else if (_iname == "ifbool") {
 		if (p_state(p_name)) {
 			while ($2 ~ /^!/) { _x["inv"]++; $2 = substr($2, 2) }
@@ -257,15 +272,15 @@ function eval_input(p_name,    _iname, _res, _x) {
 		} else {
 			_x["boolval"] = 0
 		}
-		p_push(p_name, _x["boolval"])
+		p_push(p_name, "if", _x["boolval"])
 	} else if (_iname == "ifdef") {
-		p_push(p_name, !!isdef($2))
+		p_push(p_name, "if", !!isdef($2))
 	} else if (_iname == "ifndef") {
-		p_push(p_name, !isdef($2))
+		p_push(p_name, "if", !isdef($2))
 	} else if (_iname == "else") {
-		p_push(p_name, !p_pop(p_name))
+		p_push(p_name, "if", !p_pop(p_name, "if"))
 	} else if (_iname == "endif") {
-		p_pop(p_name)
+		p_pop(p_name, "if")
 	} else if (_iname == "define") {
 		if (p_state(p_name)) {
 			_x["value"] = substr($0, index($0, $2) + length($2))
@@ -280,23 +295,39 @@ function eval_input(p_name,    _iname, _res, _x) {
 	} else if (_iname == "defblock") {
 		_x["blockname"] = $2
 
-		if ("defblock" == p_name)
+		if ("defblock" == p_name) {
 			fatal("#defblocks cannot be nested")
+		}
+
 		if (p_state(p_name)) {
 			if (_x["blockname"] in s_blocks)
 				fatal("block `" _x["blockname"] "' is already defined")
 			# register block even if it's empty
 			s_blocks[_x["blockname"]] = ""
 		}
-		while (0 < input_nextline() && !/^#endblock( |$)/) {
+
+		p_push(p_name, "block", 1)
+
+		while (0 < input_nextline()) {
+			if (/^#endblock([ \t]|$)/) {
+				_x["endline"] = $0
+				break
+			}
 			if (p_state(p_name)) {
 				s_blocks[_x["blockname"]] = s_blocks[_x["blockname"]] eval_input("defblock")
 			}
 		}
 		if (!p_isempty("defblock")) {
-			fatal("unclosed #if* in #defblock")
+			fatal("unclosed #" p_last("defblock", "type") " in #defblock")
 		}
 		p_delete("defblock")
+
+		if (_x["endline"]) {
+			$0 = _x["endline"]
+			_res = _res eval_input(p_name)
+		}
+	} else if (_iname == "endblock") {
+		p_pop(p_name, "block")
 	} else if (_iname == "warning") {
 		if (p_state(p_name)) {
 			_x["msg"] = $0
@@ -318,18 +349,20 @@ function eval_input(p_name,    _iname, _res, _x) {
 			$1 = $2 = ""
 			_x["numforitems"] = splitinto(expand_definitions($0), _x, "foritems", " ")
 
+			p_push(p_name, "foreach", 1)
+
 			# read and store loop body
 			_x["loopbody_lines"] = 0
-			while (0 < input_nextline() && !/^#endforeach( |$)/) {
+			while (0 < input_nextline()) {
+				if (/^#endforeach([ \t]|$)/) {
+					_x["endline"] = $0
+					break
+				}
 				++_x["loopbody_lines"]
 				_x["loopbody", _x["loopbody_lines"]] = $0
 			}
-			if (!/^#endforeach( |$)/) {
-				# unclosed foreach
-				fatal("unclosed #foreach")
-			}
 
-			if (p_state(p_name) && 0 < _x["loopbody_lines"]) {
+			if (_x["endline"] && p_state(p_name) && 0 < _x["loopbody_lines"]) {
 				if (_x["loopvar"] in DEFIN) {
 					_x["olddef"] = DEFIN[_x["loopvar"]]
 				}
@@ -338,7 +371,6 @@ function eval_input(p_name,    _iname, _res, _x) {
 				for (_x["i"] = 1; _x["i"] <= _x["numforitems"]; ++_x["i"]) {
 					DEFIN[_x["loopvar"]] = _x["foritems", _x["i"]]
 					for (_x["l"] = 1; _x["l"] <= _x["loopbody_lines"]; ++_x["l"]) {
-						# XXX: separate p_name for loop iterations
 						$0 = _x["loopbody", _x["l"]]
 						_res = _res eval_input(p_name)
 					}
@@ -350,6 +382,13 @@ function eval_input(p_name,    _iname, _res, _x) {
 					delete DEFIN[_x["loopvar"]]
 				}
 			}
+
+			if (_x["endline"]) {
+				$0 = _x["endline"]
+				_res = _res eval_input(p_name)
+			}
+		} else if (_iname == "endforeach") {
+			p_pop(p_name, "foreach")
 		} else if (_iname == "include") {
 			# store old file variables
 			_x["old_INCFILENAME"] = INCFILENAME
@@ -443,6 +482,6 @@ BEGIN {
 
 END {
 	if ((0 == e) && !p_isempty("main")) {
-		fatal("unclosed #if*")
+		fatal(sprintf("unclosed #%s (opened at %s)", p_last("main", "type"), p_last("main", "loc")))
 	}
 }
