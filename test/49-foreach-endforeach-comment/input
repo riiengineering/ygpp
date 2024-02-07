@@ -1,0 +1,6 @@
+#foreach x a b c
+x is %{x}
+#endforeach x
+#foreach y 1 2 3
+y is %{y}
+#endforeach	 y

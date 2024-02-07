@@ -1,0 +1,11 @@
+#ifdef SOMETHING
+this will never be printed
+#endif SOMETHING
+#define SOMETHING
+#ifdef SOMETHING
+this is printed.
+#endif  SOMETHING2
+#define X true
+#ifbool X
+X is true.
+#endif	bool X
