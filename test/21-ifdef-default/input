@@ -1,0 +1,7 @@
+#ifndef GREETING
+#define GREETING Hello
+#endif
+#ifndef WORLD
+#define WORLD world
+#endif
+%{GREETING} %{WORLD}!
