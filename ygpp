@@ -303,6 +303,10 @@ function eval_input(p_name,    _iname, _res, _x) {
 	} else if (_iname == "ifndef") {
 		p_push(p_name, "if", !isdef($2))
 	} else if (_iname == "else") {
+		if ("if" != p_last(p_name, "type")) {
+			fatal("#else can only be used within an #if")
+		}
+
 		p_set(p_name, !p_last(p_name))
 	} else if (_iname == "endif") {
 		p_pop(p_name, "if")

@@ -1,0 +1,1 @@
+test/29-else-outside-if/input:1: error: #else can only be used within an #if
