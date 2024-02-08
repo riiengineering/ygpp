@@ -197,7 +197,7 @@ function p_push(p_name, type, v) {
 }
 
 function p_pop(p_name, type,   _ov) {
-	if (p_stacks[p_name, "p_last"] < 1) {
+	if (p_isempty(p_name)) {
 		fatal(sprintf("no matching #%s for #end%s", type, type))
 	}
 	if (type != p_stacks[p_name, p_stacks[p_name, "p_last"] ".type"]) {
@@ -229,12 +229,12 @@ function p_last(p_name, info) {
 }
 
 function p_state(p_name) {
-	# p_last implies p_state
-	return !p_stacks[p_name, "p_last"] || p_stacks[p_name, "p_state"]
+	# an empty p_stack is considered true
+	return p_isempty(p_name) || p_stacks[p_name, "p_state"]
 }
 
 function p_isempty(p_name) {
-	return !p_stacks[p_name, "p_last"]
+	return (1 > p_stacks[p_name, "p_last"])
 }
 
 function p_delete(p_name,    _k) {
