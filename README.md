@@ -95,6 +95,15 @@ in the process' environment.
 like `#ifdef` but negated, i.e. the lines inside this block are printed if
 `VARIABLE` is *not* defined in the process' environment.
 
+#### `#switch VARIABLE` [`#case ...` ...]... [`#default` ...] `#endswitch`
+
+switch based on the current contents of `VARIABLE`.
+the `#case`s are _not_ fall-through like they are in C-like languages.
+
+The `#default` branch will be used if none of the `#case`s matched.
+
+The behaviour is unspecified when a `#case` with the same value occurs more than once.
+
 
 ### Loops
 
@@ -106,6 +115,7 @@ being set to each of the `ITEMS` once.
 
 `#foreach` cannot be nested.
 
+The `VARIABLE` is scoped to the `#foreach` block. The value of `VARIABLE` is restored at the end of the foreach loop.
 
 ### Blocks
 

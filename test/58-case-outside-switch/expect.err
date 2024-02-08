@@ -1,0 +1,1 @@
+test/58-case-outside-switch/input:2: error: #case can only be used within a #switch

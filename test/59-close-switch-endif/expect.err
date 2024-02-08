@@ -1,0 +1,1 @@
+test/59-close-switch-endif/input:7: error: cannot close #switch with #endif (opened at test/59-close-switch-endif/input:2)

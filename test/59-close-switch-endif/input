@@ -1,0 +1,7 @@
+#define LANG de
+#switch LANG
+#case de
+Die Sprache ist Deutsch.
+#default
+The language is a different one.
+#endif

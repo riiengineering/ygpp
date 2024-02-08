@@ -1,0 +1,8 @@
+#define NAME Bob
+#switch NAME
+#case Hans
+Hallo %{NAME}.
+#case Bob
+Hello %{NAME}.
+#case Luigi
+Ciao %{NAME}.

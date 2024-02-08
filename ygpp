@@ -212,9 +212,10 @@ function p_pop(p_name, type,   _ov) {
 		              p_stacks[p_name, p_stacks[p_name, "p_last"] ".loc"]))
 	}
 	_ov = p_stacks[p_name, p_stacks[p_name, "p_last"]]
-	delete p_stacks[p_name, p_stacks[p_name, "p_last"]]
+	delete p_stacks[p_name, p_stacks[p_name, "p_last"] ".meta"]
 	delete p_stacks[p_name, p_stacks[p_name, "p_last"] ".loc"]
 	delete p_stacks[p_name, p_stacks[p_name, "p_last"] ".type"]
+	delete p_stacks[p_name, p_stacks[p_name, "p_last"]]
 	--p_stacks[p_name, "p_last"]
 	_p_update(p_name)
 	return _ov
@@ -225,8 +226,18 @@ function p_set(p_name, v) {
 	# this is used for switching conditional branches (if/switch)
 
 	if (p_isempty(p_name)) return
+
 	p_stacks[p_name, p_stacks[p_name, "p_last"]] = v
 	_p_update(p_name)
+}
+
+function p_meta(p_name, v) {
+	if (p_isempty(p_name)) return
+
+	if ("" != v) {
+		p_stacks[p_name, p_stacks[p_name, "p_last"] ".meta"] = v
+	}
+	return p_stacks[p_name, p_stacks[p_name, "p_last"] ".meta"]
 }
 
 function p_last(p_name, info) {
@@ -295,6 +306,26 @@ function eval_input(p_name,    _iname, _res, _x) {
 		p_set(p_name, !p_last(p_name))
 	} else if (_iname == "endif") {
 		p_pop(p_name, "if")
+	} else if (_iname == "switch") {
+		p_push(p_name, "switch", 0)
+		p_meta(p_name, $2)
+	} else if (_iname == "case") {
+		if ("switch" != p_last(p_name, "type")) {
+			fatal("#case can only be used within a #switch")
+		}
+
+		_x["caseval"] = $0
+		sub(/^#case[ \t]+/, "", _x["caseval"])
+		_x["boolval"] = (getdef(p_meta(p_name)) == _x["caseval"])
+		p_set(p_name, (_x["boolval"] ? 1 : -p_last(p_name)))
+	} else if (_iname == "default") {
+		if ("switch" != p_last(p_name, "type")) {
+			fatal("#default can only be used within a #switch")
+		}
+
+		p_set(p_name, !p_last(p_name))
+	} else if (_iname == "endswitch") {
+		p_pop(p_name, "switch")
 	} else if (_iname == "define") {
 		if (p_state(p_name)) {
 			_x["value"] = substr($0, index($0, $2) + length($2))

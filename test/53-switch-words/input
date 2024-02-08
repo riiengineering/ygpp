@@ -1,0 +1,8 @@
+#define VAR hello world
+%{VAR}
+#switch VAR
+#case hello world
+VAR is hello world.
+#default
+VAR is not hello world.
+#endswitch

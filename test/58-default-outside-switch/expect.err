@@ -1,0 +1,1 @@
+test/58-default-outside-switch/input:2: error: #default can only be used within a #switch

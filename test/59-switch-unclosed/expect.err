@@ -1,0 +1,1 @@
+test/59-switch-unclosed/input:8: error: unclosed #switch (opened at test/59-switch-unclosed/input:2)

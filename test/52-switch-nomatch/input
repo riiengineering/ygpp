@@ -1,0 +1,7 @@
+#define X 42
+#switch X
+#case 10
+X is 10.
+#case 20
+X is 20.
+#endswitch

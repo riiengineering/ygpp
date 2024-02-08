@@ -1,0 +1,11 @@
+#define X 2
+#switch X
+#case 1
+X is 1.
+#case 2
+X is 2.
+#case 3
+X is 3.
+#default
+X is neither 1, 2, nor 3.
+#endswitch

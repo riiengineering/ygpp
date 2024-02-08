@@ -1,0 +1,16 @@
+#dnl test switch default branch with 2 cases
+#define X 3
+#switch X
+#case 1
+X is 1.
+#case 2
+X is 2.
+#default
+X is neither 1 nor 2.
+#endswitch
+#dnl test switch with only a default branch
+#define Y 1
+#switch Y
+#default
+Y is set to something.
+#endswitch
