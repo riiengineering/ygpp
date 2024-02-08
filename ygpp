@@ -182,9 +182,14 @@ function eval_shell_cmd(cmd,    _k) {
 }
 
 function _p_update(p_name,    _i, _s) {
+	# NOTE: values > 0 are considered true
 	_s = 1
-	for (_i = 1; _i <= p_stacks[p_name, "p_last"]; ++_i)
-		_s = _s && p_stacks[p_name, _i]
+	for (_i = 1; _i <= p_stacks[p_name, "p_last"]; ++_i) {
+		if (0 >= p_stacks[p_name, _i]) {
+			_s = 0
+			break
+		}
+	}
 	p_stacks[p_name, "p_state"] = _s
 }
 
