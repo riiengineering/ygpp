@@ -1,0 +1,1 @@
+test/39-ifelse-unclosed/input:5: error: unclosed #if (opened at test/39-ifelse-unclosed/input:2)

@@ -1,0 +1,5 @@
+#define X 42
+#ifdef X
+X is defined.
+#else
+X is not defined.
