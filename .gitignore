@@ -1,4 +1,6 @@
 /build/
+/ygpp-*.tar
+/ygpp-*.tar.*
 
 # Created by https://www.toptal.com/developers/gitignore/api/emacs,git,linux,osx,vim,windows
 

@@ -98,4 +98,4 @@ jobs:
           echo '::endgroup::'
       - name: Run unit tests
         run: |
-          make AWK='${{ env.AWK }}' test
+          make AWK='${{ env.AWK }}' check
