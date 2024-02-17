@@ -57,7 +57,7 @@ $(PACKAGE)-$(VERSION).tar: .PHONY
 	@echo creating $@...
 	@tar cvf $@ Makefile ygpp LICENSE README.md
 	@tar rvf $@ test/run.sh
-	@find test \( -name 'input' -o -name 'expect.*[a-z]' -o -path '*/inc/*[a-z0-9]' \) -exec tar rvf $@ {} +
+	@find test \( -name 'input' -o -name 'env' -o -name 'expect.*[a-z]' -o -path '*/inc/*[a-z0-9]' \) -exec tar rvf $@ {} +
 
 DIST_FILENAME = $(PACKAGE)-$(VERSION).tar
 dist: $(DIST_FILENAME)$(DIST_COMPRESS)
