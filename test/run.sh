@@ -4,6 +4,20 @@ set -e -u
 : "${AWK:=awk}"
 : "${YGPP:=$(cd "${0%/*}/.." && pwd -P)/ygpp}"
 
+tests_dir=${0%/*}
+
+command -v diff >/dev/null 2>&1 || {
+	echo 'Missing diff(1) on this system.' >&2
+	exit 1
+}
+
+if command -v cmp >/dev/null 2>&1
+then
+	check_same() { cmp -s "$1" "$2"; }
+else
+	check_same() { diff -q "$1" "$2" >/dev/null; }
+fi
+
 case ${NOCOLOR+0}
 in
 	(0) coloured_output=false ;;
@@ -36,8 +50,6 @@ then
 else
 	showdiff() { dodiff "$@"; }
 fi
-
-tests_dir=${0%/*}
 
 tmpdir=$(mktemp -d)
 test -d "${tmpdir-}" || exit 1
@@ -99,8 +111,8 @@ do
 
 	if
 		test $((test_rc)) -eq $((expect_status)) \
-		&& cmp -s "${expect_out}" "${test_out}" \
-		&& cmp -s "${expect_err}" "${test_err}"
+		&& check_same "${expect_out}" "${test_out}" \
+		&& check_same "${expect_err}" "${test_err}"
 	then
 		${STDOUT_ISATTY?} && printf '\r'
 		if ${coloured_output?}
