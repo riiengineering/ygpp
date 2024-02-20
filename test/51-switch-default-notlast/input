@@ -1,0 +1,9 @@
+#define X foo
+#switch X
+#case foo
+X is foo.
+#default
+X is not foo.
+#case bar
+X is bar.
+#endswitch

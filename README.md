@@ -101,6 +101,7 @@ switch based on the current contents of `VARIABLE`.
 the `#case`s are _not_ fall-through like they are in C-like languages.
 
 The `#default` branch will be used if none of the `#case`s matched.
+Thus `#default` must be last.
 
 The behaviour is unspecified when a `#case` with the same value occurs more than once.
 

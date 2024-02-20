@@ -53,6 +53,10 @@ function fatal(errmsg) {
 	exit (e=1)
 }
 
+function abs(x) {
+	return 0 <= x ? x : -x
+}
+
 function bool(v) {
 	if (v ~ /^(TRUE|[Tt]rue)$/)
 		return 1
@@ -321,13 +325,19 @@ function eval_input(p_name,    _iname, _res, _x) {
 		_x["caseval"] = $0
 		sub(/^#case[ \t]+/, "", _x["caseval"])
 		_x["boolval"] = (getdef(p_meta(p_name)) == _x["caseval"])
-		p_set(p_name, (_x["boolval"] ? 1 : -p_last(p_name)))
+
+		if (2 == abs(p_last(p_name))) {
+			fatal("#default must be the last branch in a #switch")
+		}
+		p_set(p_name, (_x["boolval"] ? 1 : -abs(p_last(p_name))))
 	} else if (_iname == "default") {
 		if ("switch" != p_last(p_name, "type")) {
 			fatal("#default can only be used within a #switch")
 		}
 
-		p_set(p_name, !p_last(p_name))
+		# state 2 is default match (=no case match),
+		#      -2 is default no match (=case match)
+		p_set(p_name, 2 * (p_last(p_name) ? -1 : 1))
 	} else if (_iname == "endswitch") {
 		p_pop(p_name, "switch")
 	} else if (_iname == "define") {

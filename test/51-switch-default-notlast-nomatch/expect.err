@@ -1,0 +1,1 @@
+test/51-switch-default-notlast-nomatch/input:7: error: #default must be the last branch in a #switch
