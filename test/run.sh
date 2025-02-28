@@ -51,8 +51,20 @@ else
 	showdiff() { dodiff "$@"; }
 fi
 
-tmpdir=$(mktemp -d)
-test -d "${tmpdir-}" || exit 1
+if command -v mktemp >/dev/null 2>&1
+then
+	tmpdir=$(mktemp -d)
+elif command -v perl >/dev/null 2>&1
+then
+	tmpdir=$(perl -e '
+	         use File::Temp;
+	         printf "%s\n", File::Temp->newdir(CLEANUP => 0);')
+fi
+test -d "${tmpdir-}" || {
+	echo 'Could not create temporary directory.' >&2
+	echo 'Please make sure mktemp(1) is in $PATH or Perl (File::Temp) is installed.' >&2
+	exit 1
+}
 trap 'rm -R -f "${tmpdir}"' EXIT
 
 failed_tests=0

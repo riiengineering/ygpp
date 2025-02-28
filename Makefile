@@ -1,7 +1,7 @@
 # This Makefile uses the GNU standard make targets
 # https://www.gnu.org/prep/standards/html_node/Standard-Targets.html
+
 .POSIX:
-.PHONY:
 .SUFFIXES: .tar .tar.gz .tar.bz2 .tar.xz .tar.zst .tar.Z
 
 PACKAGE = ygpp
@@ -70,3 +70,4 @@ dist-tarZ: $(DIST_FILENAME).Z
 check: .PHONY
 	$(SH) test/run.sh
 
+.PHONY:
