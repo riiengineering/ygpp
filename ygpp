@@ -2,7 +2,7 @@
 #
 # This is Yoshi's Generic Preprocessor, a line-based generic file preprocessor.
 #
-# Copyright 2022-2024 Dennis Camera (dennis.camera at riiengineering.ch)
+# Copyright 2022-2025 Dennis Camera (dennis.camera at riiengineering.ch)
 #
 # This file is part of ygpp.
 #
@@ -393,10 +393,9 @@ function eval_input(p_name,    _iname, _res, _x) {
 			sub(/^#warning[ \t]+/, "", _x["msg"])
 			warn(_x["msg"])
 		}
-	} else {
+	} else if (p_state(p_name)) {
 		# directives which produce output
-		if (!p_state(p_name))
-			return
+		# process them only when not in a falsy block
 
 		if (_iname == "useblock") {
 			if (!($2 in s_blocks))
@@ -522,6 +521,8 @@ function eval_input(p_name,    _iname, _res, _x) {
 
 		return _res
 	}
+
+	return ""
 }
 
 BEGIN {
